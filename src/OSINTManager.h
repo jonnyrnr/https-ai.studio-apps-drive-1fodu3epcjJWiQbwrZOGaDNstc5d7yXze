@@ -24,6 +24,8 @@ private:
     juce::String executeCommand(const std::string& command);
     juce::String getPythonPath();
     bool checkPythonEnvironment();
+    std::string sanitizeInput(const std::string& input);
+    std::string buildCommand(const std::string& tool, const std::string& args);
     
     juce::String pythonPath;
     bool pythonAvailable;

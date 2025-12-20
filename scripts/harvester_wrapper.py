@@ -6,6 +6,21 @@ Provides a simplified interface for OSINT data gathering
 import sys
 import subprocess
 import json
+import re
+
+def validate_domain(domain):
+    """
+    Validate domain name format
+    
+    Args:
+        domain: Domain string to validate
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    # Basic domain validation regex
+    pattern = r'^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$'
+    return bool(re.match(pattern, domain))
 
 def run_harvester(domain, sources="google,bing"):
     """
@@ -15,6 +30,13 @@ def run_harvester(domain, sources="google,bing"):
         domain: Target domain to investigate
         sources: Comma-separated list of sources (default: google,bing)
     """
+    # Validate domain input
+    if not validate_domain(domain):
+        return json.dumps({
+            "status": "error",
+            "message": "Invalid domain format. Please provide a valid domain name."
+        })
+    
     try:
         cmd = ["theHarvester", "-d", domain, "-b", sources]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)

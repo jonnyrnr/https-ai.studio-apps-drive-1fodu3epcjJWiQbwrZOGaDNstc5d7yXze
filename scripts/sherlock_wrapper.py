@@ -6,6 +6,21 @@ Provides a simplified interface for username enumeration
 import sys
 import subprocess
 import json
+import re
+
+def validate_username(username):
+    """
+    Validate username format
+    
+    Args:
+        username: Username string to validate
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    # Username validation: alphanumeric, underscore, dash, 1-30 chars
+    pattern = r'^[a-zA-Z0-9_-]{1,30}$'
+    return bool(re.match(pattern, username))
 
 def run_sherlock(username):
     """
@@ -14,6 +29,13 @@ def run_sherlock(username):
     Args:
         username: Target username to search for
     """
+    # Validate username input
+    if not validate_username(username):
+        return json.dumps({
+            "status": "error",
+            "message": "Invalid username format. Use only alphanumeric, underscore, dash (1-30 chars)."
+        })
+    
     try:
         cmd = ["sherlock", username, "--print-found"]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)

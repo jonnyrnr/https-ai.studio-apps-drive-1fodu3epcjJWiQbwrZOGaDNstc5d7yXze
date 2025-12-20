@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <array>
 #include <memory>
+#include <sstream>
+#include <regex>
 
 OSINTManager::OSINTManager()
     : pythonAvailable(false)
@@ -28,6 +30,37 @@ bool OSINTManager::checkPythonEnvironment()
 {
     auto result = executeCommand(pythonPath.toStdString() + " --version");
     return result.isNotEmpty() && result.contains("Python");
+}
+
+std::string OSINTManager::sanitizeInput(const std::string& input)
+{
+    // Remove potentially dangerous characters for shell commands
+    std::string sanitized = input;
+    std::regex dangerousChars("[;&|`$(){}\\[\\]<>'\"]");
+    sanitized = std::regex_replace(sanitized, dangerousChars, "");
+    
+    // Trim whitespace
+    sanitized.erase(0, sanitized.find_first_not_of(" \t\n\r"));
+    sanitized.erase(sanitized.find_last_not_of(" \t\n\r") + 1);
+    
+    return sanitized;
+}
+
+std::string OSINTManager::buildCommand(const std::string& tool, const std::string& args)
+{
+    juce::File venvActivate("venv/bin/activate");
+    std::ostringstream command;
+    
+    if (venvActivate.exists())
+    {
+        command << "source venv/bin/activate && " << tool << " " << args << " 2>&1";
+    }
+    else
+    {
+        command << tool << " " << args << " 2>&1";
+    }
+    
+    return command.str();
 }
 
 juce::String OSINTManager::executeCommand(const std::string& command)
@@ -61,18 +94,17 @@ juce::String OSINTManager::runTheHarvester(const std::string& target)
         return "Error: Python environment not available. Please run deploy.sh first.";
     }
     
-    // Check if venv is available
-    juce::File venvActivate("venv/bin/activate");
-    std::string command;
+    // Sanitize input to prevent command injection
+    std::string sanitizedTarget = sanitizeInput(target);
     
-    if (venvActivate.exists())
+    if (sanitizedTarget.empty())
     {
-        command = "source venv/bin/activate && theHarvester -d " + target + " -b google,bing 2>&1";
+        return "Error: Invalid target domain provided.";
     }
-    else
-    {
-        command = "theHarvester -d " + target + " -b google,bing 2>&1";
-    }
+    
+    // Build command with sanitized input
+    std::string args = "-d " + sanitizedTarget + " -b google,bing";
+    std::string command = buildCommand("theHarvester", args);
     
     juce::String results = executeCommand(command);
     
@@ -91,18 +123,16 @@ juce::String OSINTManager::runSherlock(const std::string& username)
         return "Error: Python environment not available. Please run deploy.sh first.";
     }
     
-    // Check if venv is available
-    juce::File venvActivate("venv/bin/activate");
-    std::string command;
+    // Sanitize input to prevent command injection
+    std::string sanitizedUsername = sanitizeInput(username);
     
-    if (venvActivate.exists())
+    if (sanitizedUsername.empty())
     {
-        command = "source venv/bin/activate && sherlock " + username + " 2>&1";
+        return "Error: Invalid username provided.";
     }
-    else
-    {
-        command = "sherlock " + username + " 2>&1";
-    }
+    
+    // Build command with sanitized input
+    std::string command = buildCommand("sherlock", sanitizedUsername);
     
     juce::String results = executeCommand(command);
     
