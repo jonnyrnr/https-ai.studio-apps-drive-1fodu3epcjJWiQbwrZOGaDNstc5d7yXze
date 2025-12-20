@@ -26,10 +26,39 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(juce)
 
+# Add JUCE GUI application target
+juce_add_gui_app(Swampify
+    PRODUCT_NAME "Swampify"
+    COMPANY_NAME "SwampifyDev"
+    BUNDLE_ID "com.swampify.app"
+    VERSION 0.1.0)
+
+# Add source files
+target_sources(Swampify PRIVATE
+    src/Main.cpp
+    src/MainComponent.cpp
+    src/MainComponent.h
+    src/OSINTManager.cpp
+    src/OSINTManager.h)
+
+# Link JUCE modules
+target_link_libraries(Swampify PRIVATE
+    juce::juce_gui_basics
+    juce::juce_gui_extra
+    juce::juce_core
+    juce::juce_data_structures
+    juce::juce_events
+    juce::juce_graphics)
+
+# Set compile definitions
+target_compile_definitions(Swampify PRIVATE
+    JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:Swampify,JUCE_PRODUCT_NAME>"
+    JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:Swampify,JUCE_VERSION>")
+
 # Install configuration for production deployment
-# Uncomment when JUCE targets are defined in the project
-# install(TARGETS ${PROJECT_NAME}
-#     RUNTIME DESTINATION bin
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-# )
+install(TARGETS Swampify
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
