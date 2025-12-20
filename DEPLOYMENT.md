@@ -81,8 +81,9 @@ export SWAMPIFY_LOG_LEVEL=info
 
 1. Run Python tools in a virtual environment
 2. Use least-privilege user accounts
-3. Keep dependencies updated
+3. Keep dependencies updated regularly
 4. Review OSINT tool configurations before use
+5. **Important**: All Python dependencies are version-pinned in requirements.txt for reproducible builds
 
 ## Monitoring
 

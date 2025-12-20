@@ -27,8 +27,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(juce)
 
 # Install configuration for production deployment
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
+# Uncomment when JUCE targets are defined in the project
+# install(TARGETS ${PROJECT_NAME}
+#     RUNTIME DESTINATION bin
+#     LIBRARY DESTINATION lib
+#     ARCHIVE DESTINATION lib
+# )
