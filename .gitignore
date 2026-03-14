@@ -1,0 +1,43 @@
+# Build artifacts
+build/
+dist/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# JUCE
+JuceLibraryCode/
+Builds/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
